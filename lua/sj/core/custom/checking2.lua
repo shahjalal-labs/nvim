@@ -36,35 +36,3 @@ vim.keymap.set("n", "<leader>sw", function()
 		print("❌ Screenshot failed")
 	end
 end, { desc = "Area select screenshot + append markdown to README.md" })
-
---
-vim.api.nvim_create_user_command("OpenInCanary", function()
-	local current_file = vim.fn.expand("%:p")
-	local fallback = vim.fn.expand("~/fallback.html")
-	local chrome_bin = "google-chrome-canary"
-
-	local check_command = [[
-    curl --silent http://127.0.0.1:9222/json | grep -iq "chatgpt"
-  ]]
-
-	vim.fn.jobstart({ "sh", "-c", check_command }, {
-		stdout_buffered = true,
-		on_exit = function(_, code)
-			local target = (code == 0) and current_file or fallback
-			local msg = (code == 0) and "✅ ChatGPT tab found — opening current file"
-				or "❌ No ChatGPT tab — opening fallback"
-
-			vim.notify(msg, vim.log.levels.INFO)
-			vim.fn.jobstart({ chrome_bin, target }, { detach = true })
-		end,
-		on_stderr = function(_, data)
-			if data then
-				print("❌ Shell error: ", vim.inspect(data))
-			end
-		end,
-	})
-end, {})
-
-vim.keymap.set("n", "<leader>gw", "<cmd>OpenInCanary<CR>", {
-	desc = "Open current file if any ChatGPT tab is open",
-})
