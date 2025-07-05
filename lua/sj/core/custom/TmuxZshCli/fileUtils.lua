@@ -45,14 +45,14 @@ end
 --
 --
 --w: 3╭──────────── Block Start ────────────╮
--- Generate clean directory tree markdown
+-- Generate clean directory tree markdown with clipboard and open
 local function generate_structure_md()
 	local cwd = vim.fn.getcwd()
 	local output_file = cwd .. "/structure.md"
 
 	local handle = io.popen("tree -C -I '.git|node_modules|.DS_Store|dist'")
 	if not handle then
-		print("❌ Failed to run tree command.")
+		vim.notify("❌ Failed to run tree command.", vim.log.levels.ERROR)
 		return
 	end
 
@@ -62,25 +62,30 @@ local function generate_structure_md()
 	-- Remove ANSI color codes
 	result = result:gsub("\27%[[0-9;]*m", "")
 
+	local md_content = "# 📁 Project Structure\n\n```bash\n" .. result .. "\n```\n"
+
+	-- Write to file
 	local file = io.open(output_file, "w")
 	if not file then
-		print("❌ Cannot open structure.md for writing.")
+		vim.notify("❌ Cannot open structure.md for writing.", vim.log.levels.ERROR)
 		return
 	end
 
-	file:write("# 📁 Project Structure\n\n")
-	file:write("```bash\n")
-	file:write(result)
-	file:write("\n```\n")
+	file:write(md_content)
 	file:close()
 
-	print("✅ structure.md updated successfully.")
+	-- Open the file in a new tab
+	vim.cmd("tabnew " .. output_file)
+
+	-- Copy to system clipboard
+	vim.fn.setreg("+", md_content)
+	vim.notify("✅ structure.md created, opened, and copied to clipboard.", vim.log.levels.INFO)
 end
 
 vim.keymap.set("n", "<leader>ds", generate_structure_md, {
 	noremap = true,
 	silent = true,
-	desc = "🗂️ Generate structure.md",
+	desc = "🗂️ Generate structure.md and copy",
 })
 --w: 3╰───────────── Block End ─────────────╯
 --go to package.json file
