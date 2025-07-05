@@ -1,3 +1,7 @@
+-- Improved JSX paste into component:
+-- Converts single-line `return <div></div>;` into multiline JSX return with pasted content inside <div>
+-- Inserts clipboard properly inside existing multiline returns as well
+
 local function auto_paste_to_component()
 	local clipboard = vim.fn.getreg("+")
 	if clipboard == nil or clipboard == "" then
@@ -21,19 +25,35 @@ local function auto_paste_to_component()
 				vim.notify("✅ Found component: " .. component_name, vim.log.levels.INFO)
 				vim.cmd("edit " .. file)
 
-				-- single-line <div></div>
+				-- Search for single-line return <div></div>;
 				for lnum, line in ipairs(lines) do
-					if line:match("return%s*<div>%s*</div>%s*;") then
-						vim.api.nvim_win_set_cursor(0, { lnum, 0 })
-						vim.cmd("normal! o")
-						vim.fn.setreg('"', clipboard)
-						vim.cmd('normal! ""p')
+					if line:match("^%s*return%s*<div>%s*</div>%s*;") then
+						-- Replace this single line with multiline JSX with clipboard inside <div>
+						-- Construct new lines:
+						local indent = line:match("^(%s*)return") or ""
+						local new_lines = {
+							indent .. "return (",
+							indent .. "  <div>",
+						}
+
+						-- Insert clipboard content lines with extra indentation
+						for clip_line in clipboard:gmatch("[^\r\n]+") do
+							table.insert(new_lines, indent .. "    " .. clip_line)
+						end
+
+						table.insert(new_lines, indent .. "  </div>")
+						table.insert(new_lines, indent .. ");")
+
+						-- Replace the single line in buffer with these new lines
+						vim.api.nvim_buf_set_lines(0, lnum - 1, lnum, false, new_lines)
+						-- Move cursor inside the pasted content line (first clipboard line)
+						vim.api.nvim_win_set_cursor(0, { lnum + 2, 0 })
 						vim.cmd("write")
 						return
 					end
 				end
 
-				-- multiline return (
+				-- Search for multiline return with empty <div> block
 				for lnum = 1, #lines - 4 do
 					if
 						lines[lnum]:match("^%s*return%s*%(%s*$")
@@ -41,10 +61,18 @@ local function auto_paste_to_component()
 						and lines[lnum + 3]:match("^%s*</div>%s*$")
 						and lines[lnum + 4]:match("^%s*%)%s*;?%s*$")
 					then
+						-- Insert clipboard lines inside <div> block (between lnum+1 and lnum+3)
+						local indent = lines[lnum + 1]:match("^(%s*)<div>") or ""
+						local clip_lines = {}
+						for clip_line in clipboard:gmatch("[^\r\n]+") do
+							table.insert(clip_lines, indent .. "  " .. clip_line)
+						end
+
+						-- Insert clip_lines after line lnum+1 (<div> line)
+						vim.api.nvim_buf_set_lines(0, lnum + 1, lnum + 1, false, clip_lines)
+
+						-- Move cursor to first pasted line
 						vim.api.nvim_win_set_cursor(0, { lnum + 2, 0 })
-						vim.cmd("normal! o")
-						vim.fn.setreg('"', clipboard)
-						vim.cmd('normal! ""p')
 						vim.cmd("write")
 						return
 					end
@@ -56,25 +84,24 @@ local function auto_paste_to_component()
 	vim.notify("❌ No valid empty component found.", vim.log.levels.WARN)
 end
 
--- Wrapper function with delay
 local function delayed_paste()
 	vim.defer_fn(function()
 		auto_paste_to_component()
 	end, 400) -- 400 ms delay
 end
 
--- Map dat and dst to run original command then delayed paste
+-- Map dat: delete tag normally + delayed paste & switch to new component file
 vim.keymap.set({ "n", "x" }, "dat", function()
 	vim.cmd("normal! dat")
 	delayed_paste()
 end, { noremap = true, silent = true })
 
+-- Map dst: delete tag normally only (no paste)
 vim.keymap.set({ "n", "x" }, "dst", function()
 	vim.cmd("normal! dst")
-	delayed_paste()
 end, { noremap = true, silent = true })
 
--- Visual mode mapping <leader>cp remains same
+-- Visual mode mapping <leader>cp:
 vim.keymap.set("v", "<leader>cp", function()
 	vim.cmd('normal! "+y')
 	vim.cmd("normal! d")
