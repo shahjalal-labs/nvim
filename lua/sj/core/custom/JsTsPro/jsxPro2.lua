@@ -1,6 +1,3 @@
--- JSX Clipboard Auto-Paste for single-line or multiline empty <div>
--- Paste into your init.lua or keymaps.lua
-
 local function auto_paste_to_component()
 	local clipboard = vim.fn.getreg("+")
 	if clipboard == nil or clipboard == "" then
@@ -24,7 +21,7 @@ local function auto_paste_to_component()
 				vim.notify("✅ Found component: " .. component_name, vim.log.levels.INFO)
 				vim.cmd("edit " .. file)
 
-				-- First try single-line return <div></div>;
+				-- single-line <div></div>
 				for lnum, line in ipairs(lines) do
 					if line:match("return%s*<div>%s*</div>%s*;") then
 						vim.api.nvim_win_set_cursor(0, { lnum, 0 })
@@ -36,7 +33,7 @@ local function auto_paste_to_component()
 					end
 				end
 
-				-- Then try multiline pattern
+				-- multiline return (
 				for lnum = 1, #lines - 4 do
 					if
 						lines[lnum]:match("^%s*return%s*%(%s*$")
@@ -56,25 +53,30 @@ local function auto_paste_to_component()
 		end
 	end
 
-	vim.notify("❌ No valid empty component with empty <div> found in recent files.", vim.log.levels.WARN)
+	vim.notify("❌ No valid empty component found.", vim.log.levels.WARN)
 end
 
--- Visual mode mapping: <leader>cp
-vim.keymap.set("v", "<leader>cp", function()
-	vim.cmd('normal! "+y') -- yank visual selection to clipboard
-	vim.cmd("normal! d") -- delete selection
-	auto_paste_to_component()
-end, { desc = "Move selected JSX to last created component", noremap = true, silent = true })
+-- Wrapper function with delay
+local function delayed_paste()
+	vim.defer_fn(function()
+		auto_paste_to_component()
+	end, 400) -- 400 ms delay
+end
 
--- Optional autocmd to watch for deletes and auto-paste
-vim.api.nvim_create_autocmd("TextChanged", {
-	pattern = "*",
-	callback = function()
-		local reg = vim.fn.getreg("+")
-		if reg and reg:match("</%w") then
-			vim.defer_fn(function()
-				auto_paste_to_component()
-			end, 100)
-		end
-	end,
-})
+-- Map dat and dst to run original command then delayed paste
+vim.keymap.set({ "n", "x" }, "dat", function()
+	vim.cmd("normal! dat")
+	delayed_paste()
+end, { noremap = true, silent = true })
+
+vim.keymap.set({ "n", "x" }, "dst", function()
+	vim.cmd("normal! dst")
+	delayed_paste()
+end, { noremap = true, silent = true })
+
+-- Visual mode mapping <leader>cp remains same
+vim.keymap.set("v", "<leader>cp", function()
+	vim.cmd('normal! "+y')
+	vim.cmd("normal! d")
+	delayed_paste()
+end, { desc = "Move selected JSX to last created component", noremap = true, silent = true })
