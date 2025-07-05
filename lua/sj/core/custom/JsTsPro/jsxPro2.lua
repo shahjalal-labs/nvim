@@ -1,10 +1,18 @@
 local last_component_file = nil
 local last_cursor_pos = nil
 
+-- Safely write before editing another file
+local function safe_edit(file)
+	if vim.bo.modified then
+		vim.cmd("write")
+	end
+	vim.cmd("edit " .. file)
+end
+
 local function auto_paste_to_component()
 	local clipboard = vim.fn.getreg("+")
 	if clipboard == nil or clipboard == "" then
-		vim.notify("📋 Clipboard empty — skipping paste.", vim.log.levels.WARN)
+		vim.notify("📋 Clipboard is empty!", vim.log.levels.WARN)
 		return false
 	end
 
@@ -20,9 +28,9 @@ local function auto_paste_to_component()
 			local component_name = content:match(component_pattern)
 
 			if component_name then
-				vim.cmd("edit " .. file)
+				safe_edit(file)
 
-				-- Check single-line <div></div>
+				-- Case 1: Single-line return <div></div>;
 				for lnum, line in ipairs(lines) do
 					if line:match("^%s*return%s*<div>%s*</div>%s*;") then
 						local indent = line:match("^(%s*)return") or ""
@@ -45,7 +53,7 @@ local function auto_paste_to_component()
 					end
 				end
 
-				-- Check multi-line JSX return
+				-- Case 2: Multiline return
 				for lnum = 1, #lines - 4 do
 					if
 						lines[lnum]:match("^%s*return%s*%(%s*$")
@@ -75,26 +83,26 @@ local function auto_paste_to_component()
 	return false
 end
 
-local function visual_cp_paste_to_component()
-	-- 1. Delete selection and yank to clipboard
-	vim.cmd([[normal! "+d]])
+local function visual_cut_and_paste()
+	-- Step 1: cut selection into clipboard
+	vim.cmd('normal! "+d')
 
-	-- 2. Delay to give clipboard time to update, then paste
+	-- Step 2: paste into valid component
 	vim.defer_fn(function()
-		local pasted = auto_paste_to_component()
-		if pasted and last_component_file and last_cursor_pos then
+		local success = auto_paste_to_component()
+		if success and last_component_file and last_cursor_pos then
 			vim.defer_fn(function()
-				vim.cmd("edit " .. last_component_file)
+				safe_edit(last_component_file)
 				vim.api.nvim_win_set_cursor(0, last_cursor_pos)
-				vim.notify("🎯 JSX pasted and focus moved", vim.log.levels.INFO)
+				vim.notify("✅ JSX moved and focus switched", vim.log.levels.INFO)
 			end, 300)
 		end
 	end, 300)
 end
 
--- ✅ Visual mode only: Cut selection, paste to component
-vim.keymap.set("v", "<leader>cp", visual_cp_paste_to_component, {
-	desc = "Cut JSX and move to last created component",
+-- Visual mode only: cut + paste to component
+vim.keymap.set("v", "<leader>cp", visual_cut_and_paste, {
+	desc = "Cut JSX and move it to the last created component",
 	noremap = true,
 	silent = true,
 })
