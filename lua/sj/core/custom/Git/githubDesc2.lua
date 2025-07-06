@@ -1,151 +1,92 @@
-local M = {}
-
-local function notify(msg, level)
-	vim.schedule(function()
-		vim.notify(msg, level or vim.log.levels.INFO)
-	end)
-end
-
-local function trim(s)
-	return s:match("^%s*(.-)%s*$")
-end
-
-local function shorten_desc(desc)
-	desc = desc:gsub("\n", " ") -- replace newlines with space
-	if #desc > 20 then
-		return desc:sub(1, 20)
-	else
-		return desc
+local function generate_and_run_gh_commands()
+	local repo = vim.fn.trim(vim.fn.system("gh repo view --json nameWithOwner --jq .nameWithOwner"))
+	if repo == "" then
+		vim.notify("Failed to get repo name with owner", vim.log.levels.ERROR)
+		return
 	end
-end
 
-local function extract_repo_url(lines)
+	local readme_path = "README.md"
+	local lines = {}
+
+	local file = io.open(readme_path, "r")
+	if not file then
+		vim.notify("README.md not found in current dir", vim.log.levels.ERROR)
+		return
+	end
+
+	for line in file:lines() do
+		table.insert(lines, line)
+	end
+	file:close()
+
+	-- Find description line (max 20 chars)
+	local description = "Portfolio website"
 	for _, line in ipairs(lines) do
-		local repo = line:match("%[.*%]%((https://github.com/[%w-_]+/[%w-_]+)%)")
-		if repo then
-			return repo
+		local desc = line:match("^#%s*(.+)$") or line:match("^##%s*(.+)$")
+		if desc and #desc <= 20 then
+			description = desc
+			break
 		end
 	end
-	return nil
-end
 
-local function extract_live_site(lines)
+	-- Find homepage URL from Live Site table
+	local homepage = ""
 	for i, line in ipairs(lines) do
-		if line:lower():match("live site") then
-			-- next lines might contain URL in markdown link format
-			for j = i, math.min(i + 3, #lines) do
-				local url = lines[j]:match("%((https?://[^%)]+)%)")
+		if line:match("Live Site") then
+			-- Next line after table header usually has url
+			for j = i, math.min(i + 5, #lines) do
+				local url = lines[j]:match("%[(http[^]]+)%]")
 				if url then
-					return url
+					homepage = url
+					break
 				end
 			end
+			if homepage ~= "" then
+				break
+			end
 		end
 	end
-	return nil
-end
 
-local function extract_description(lines)
-	-- Take first non-empty line after first header (# )
-	local found_header = false
-	for _, line in ipairs(lines) do
-		if line:match("^# ") then
-			found_header = true
-		elseif found_header and line:match("%S") then
-			return trim(line)
-		end
-	end
-	return "No description"
-end
-
-function M.generate_and_run_gh_commands()
-	notify("Starting GitHub About update...")
-
-	local buf_lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-
-	local repo_url = extract_repo_url(buf_lines)
-	if not repo_url then
-		notify("Failed: Could not find GitHub repo URL in README.", vim.log.levels.ERROR)
-		return
+	if homepage == "" then
+		vim.notify("Live Site URL not found, using placeholder", vim.log.levels.WARN)
+		homepage = "http://example.com"
 	end
 
-	local repo_path = repo_url:gsub("https://github.com/", "")
-
-	local live_site = extract_live_site(buf_lines) or ""
-
-	local description = extract_description(buf_lines)
-	description = shorten_desc(description)
-
-	-- Build commands
-	local cmds = {}
-
-	-- Description and homepage
-	table.insert(
-		cmds,
-		string.format('gh repo edit %s --description "%s" --homepage "%s"', repo_path, description, live_site)
-	)
-
-	-- Extract topics (just an example, if you want dynamic topic extraction, add here)
-	-- For demo, adding common topics:
+	-- Topics to add (hardcoded example)
 	local topics = { "portfolio", "react", "tailwind", "vite" }
+
+	-- Compose commands (no markdown, just plain commands)
+	local cmds = {}
+	table.insert(cmds, string.format('gh repo edit %s --description "%s" --homepage "%s"', repo, description, homepage))
 	for _, topic in ipairs(topics) do
-		table.insert(cmds, string.format("gh repo edit %s --add-topic %s", repo_path, topic))
+		table.insert(cmds, string.format("gh repo edit %s --add-topic %s", repo, topic))
 	end
 
-	local content = table.concat(cmds, "\n")
-
-	-- Write to file ghCommands.md
-	local fname = vim.fn.getcwd() .. "/ghCommands.md"
-	local fd = io.open(fname, "w")
+	-- Write commands to file
+	local outpath = "ghAbout.md"
+	local fd = io.open(outpath, "w")
 	if not fd then
-		notify("Failed to write to " .. fname, vim.log.levels.ERROR)
+		vim.notify("Failed to write " .. outpath, vim.log.levels.ERROR)
 		return
 	end
-	fd:write(content)
+	for _, c in ipairs(cmds) do
+		fd:write(c .. "\n")
+	end
 	fd:close()
 
-	-- Copy to clipboard
-	vim.fn.setreg("+", content)
+	-- Put commands in clipboard (uses vim.fn.setreg)
+	vim.fn.setreg("+", table.concat(cmds, "\n"))
 
-	-- Open file in new buffer
-	vim.cmd("edit " .. fname)
+	-- Open the file in current buffer
+	vim.cmd("edit " .. outpath)
 
-	-- Run commands internally
-	local success = true
-	for _, cmd in ipairs(cmds) do
-		local handle = io.popen(cmd .. " 2>&1")
-		if not handle then
-			notify("Failed to run command: " .. cmd, vim.log.levels.ERROR)
-			success = false
-			break
-		end
-		local result = handle:read("*a")
-		local ok, _, exit_code = handle:close()
-		if not ok or exit_code ~= 0 then
-			-- Write errors to file (append)
-			local fderr = io.open(fname, "a")
-			if fderr then
-				fderr:write("\n\n# Command failed:\n")
-				fderr:write(cmd .. "\n\n")
-				fderr:write(result .. "\n")
-				fderr:close()
-			end
-			notify("Error running command: " .. cmd .. "\nSee ghCommands.md for details.", vim.log.levels.ERROR)
-			success = false
-			break
-		end
-	end
-
-	if success then
-		notify("GitHub About updated successfully! Commands copied to clipboard and opened in ghCommands.md.")
-	end
+	vim.notify("ghAbout.md created and commands copied to clipboard!", vim.log.levels.INFO)
 end
 
--- Keybind setup
+-- Map to <leader>ge in normal mode
 vim.api.nvim_set_keymap(
 	"n",
 	"<leader>ge",
-	[[<cmd>lua require('githubDescription').generate_and_run_gh_commands()<CR>]],
+	[[<cmd>lua generate_and_run_gh_commands()<CR>]],
 	{ noremap = true, silent = true }
 )
-
-return M
