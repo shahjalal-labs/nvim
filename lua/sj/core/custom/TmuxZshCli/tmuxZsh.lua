@@ -130,3 +130,19 @@ vim.api.nvim_set_keymap("n", "<leader>tb", ":lua SendBuildCommandToTmuxPane()<CR
 
 -- w: ╰───────────── Block End ─────────────╯
 --
+-- w: ╭──────────── Block Start ────────────╮
+function SendAndOpenSurgeSite()
+	vim.ui.input({ prompt = "Enter tmux pane number (default 2): " }, function(input)
+		local pane = (input == nil or input == "") and "2" or input
+
+		local cmd =
+			'bun run build && cp dist/index.html dist/200.html && surge ./dist && xdg-open "http://$(cat public/CNAME)"'
+		local tmux_cmd = string.format("tmux send-keys -t %s '%s' Enter", pane, cmd)
+
+		vim.fn.system(tmux_cmd)
+		print("🚀 Build, publish, and open triggered on tmux pane " .. pane)
+	end)
+end
+
+vim.api.nvim_set_keymap("n", "<leader>ta", ":lua SendAndOpenSurgeSite()<CR>", { noremap = true, silent = true })
+-- w: ╰───────────── Block End ─────────────╯
