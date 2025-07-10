@@ -1,3 +1,8 @@
+--p: ╭──────────── Block Start ────────────╮
+
+--p: ╰───────────── Block End ─────────────╯
+
+--p: ╭──────────── Block Start ────────────╮
 local function copy_github_url()
 	-- Get the origin URL from git config
 	local handle = io.popen("git -C " .. vim.fn.getcwd() .. " config --get remote.origin.url")
@@ -29,3 +34,25 @@ local function copy_github_url()
 end
 
 vim.keymap.set("n", "<leader>gy", copy_github_url, { desc = "Copy current repo GitHub URL" })
+--p: ╰───────────── Block End ─────────────╯
+
+--p: ╭──────────── Block Start ────────────╮
+-- Open the current repository in the browser
+vim.keymap.set("n", "<leader>gm", ":!gh repo view --web<CR>", { noremap = true, silent = true })
+--p: ╰───────────── Block End ─────────────╯
+--
+--p: ╭──────────── Block Start ────────────╮
+
+--p: ╰───────────── Block End ─────────────╯
+--p: ╭──────────── Block Start ────────────╮
+
+--p: ╰───────────── Block End ─────────────╯
+--p: ╭──────────── Block Start ────────────╮
+
+--p: ╰───────────── Block End ─────────────╯
+--p: ╭──────────── Block Start ────────────╮
+
+--p: ╰───────────── Block End ─────────────╯
+--p: ╭──────────── Block Start ────────────╮
+
+--p: ╰───────────── Block End ─────────────╯
