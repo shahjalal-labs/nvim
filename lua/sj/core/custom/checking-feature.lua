@@ -103,7 +103,6 @@ vim.keymap.set(
 
 --w: open the project with vite
 -- Add this to your Neovim config (init.lua)
--- Add to your Neovim config (init.lua)
 vim.keymap.set("n", "<leader>ai", function()
 	-- Check if we're in a project with Vite
 	local has_vite = vim.fn.filereadable("node_modules/.bin/vite") == 1
@@ -263,28 +262,3 @@ vim.api.nvim_set_keymap("n", "t", "@r", { noremap = true, silent = false })
 
 -- command from zsh history
 -- ~/.config/nvim/lua/custom/zsh_history.lua
-return function()
-	local history_file = vim.fn.expand("~/.zsh_history")
-	local history = vim.fn.readfile(history_file)
-
-	if #history == 0 then
-		print("No command history found.")
-		return
-	end
-
-	require("fzf-lua").fzf_exec(history, {
-		prompt = "Select Zsh command: ",
-		actions = {
-			["default"] = function(selected)
-				vim.fn.system(selected[1])
-				print("Running: " .. selected[1])
-			end,
-		},
-	})
-end
-
---
---
---
--- Function to send deploy command to tmux pane 3
--- Function to send a sequence of commands to tmux pane 3
