@@ -120,7 +120,10 @@ vim.keymap.set("n", "<leader>ge", function()
 
 	-- Project CWD tree
 	local project_root = vim.fn.getcwd()
-	local cwd_tree = vim.fn.systemlist("tree -I '.git|node_modules|dist|src/assets' '" .. project_root .. "'") or {}
+	-- local cwd_tree = vim.fn.systemlist("tree -I '.git|node_modules|dist|src/assets' '" .. project_root .. "'") or {}
+	local cwd_tree = vim.fn.systemlist(
+		"tree -I '.git|node_modules|dist|build|coverage|assets' '" .. project_root .. "'"
+	) or {}
 
 	-- Module folder tree
 	local module_tree = vim.fn.systemlist("tree -I '.git|node_modules' '" .. module_path .. "'") or {}

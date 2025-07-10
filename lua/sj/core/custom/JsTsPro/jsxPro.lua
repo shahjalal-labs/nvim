@@ -385,6 +385,8 @@ end
 -- Keymap for both normal and insert mode
 vim.keymap.set({ "n", "i" }, "<leader>jg", InsertJsxFragmentAtCursor, { desc = "Insert JSX fragment <></> at cursor" })
 
+
+
 --
 --
 --
