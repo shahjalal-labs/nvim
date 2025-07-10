@@ -258,52 +258,8 @@ vim.api.nvim_set_keymap("v", "<A-A>", ":RunAltCommand<CR>", { noremap = true, si
 -- new feature two
 
 -- Function to run the current line or selected text in a Tmux pane
-function RunInTmuxPane()
-	local mode = vim.fn.mode()
-	local command = ""
 
-	-- Check if we are in Visual mode
-	if mode == "v" or mode == "V" then
-		-- Get selected text in visual mode
-		vim.cmd('normal! gv"xy') -- Copy selected text to register "x"
-		command = vim.fn.getreg("x")
-	else
-		-- Get the current line in Normal mode
-		command = vim.api.nvim_get_current_line()
-	end
-
-	-- Trim whitespace from the command
-	command = command:gsub("^%s*(.-)%s*$", "%1")
-
-	-- If there's no command, exit
-	if command == "" then
-		vim.notify("No command to execute!", vim.log.levels.WARN)
-		return
-	end
-
-	-- Prompt user for the Tmux pane number
-	local pane_number = vim.fn.input("Enter Tmux Pane Number: ")
-
-	-- Ensure pane number is valid
-	if pane_number == "" then
-		vim.notify("Tmux pane number not provided!", vim.log.levels.ERROR)
-		return
-	end
-
-	-- Execute the command in the specified Tmux pane
-	local tmux_command = string.format('tmux send-keys -t %s "%s" Enter', pane_number, command)
-	vim.fn.system(tmux_command)
-
-	-- Show notification
-	vim.notify("Sent to Tmux Pane " .. pane_number .. ": " .. command, vim.log.levels.INFO)
-end
-
--- Bind the function to Alt + X for Normal & Visual modes
-vim.api.nvim_set_keymap("n", "<A-d>", ":lua RunInTmuxPane()<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("i", "<A-d>", "<Esc> :lua RunInTmuxPane()<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("v", "<A-d>", ":lua RunInTmuxPane()<CR>", { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<leader>hk", "@r", { noremap = true, silent = false })
--- vim.api.nvim_set_keymap("n", "t", "@r", { noremap = true, silent = false })
+vim.api.nvim_set_keymap("n", "t", "@r", { noremap = true, silent = false })
 
 -- command from zsh history
 -- ~/.config/nvim/lua/custom/zsh_history.lua
@@ -327,7 +283,6 @@ return function()
 	})
 end
 
--- go to the react parent component
 --
 --
 --
