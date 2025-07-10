@@ -211,21 +211,27 @@ vim.api.nvim_set_keymap("i", "<space>jk", "type Name= ;<Esc>bb viwc", { noremap 
 end ]]
 
 function _G.change_current_window_panes_to_project_root()
-	-- Use Neovim's current working directory instead of Git root
+	-- Step 1: Get current working directory in Neovim
 	local project_root = vim.fn.getcwd()
 
-	-- Get the Tmux pane ID for the current Neovim pane
+	-- Step 2: Get current Tmux pane and window ID
 	local current_pane = vim.fn.systemlist("tmux display-message -p '#{pane_id}'")[1]
+	-- local window_index = vim.fn.systemlist("tmux display-message -p '#{window_index}'")[1]
 
-	-- Command to change all other panes in current tmux window
+	-- Step 3: Change all other panes in the current tmux window to Neovim's cwd
 	local tmux_command = "tmux list-panes -F '#{pane_id}' | grep -v '"
 		.. current_pane
 		.. "' | xargs -I {} tmux send-keys -t {} 'cd "
 		.. project_root
 		.. " && clear' Enter"
 
-	-- Execute the command
 	vim.fn.system(tmux_command)
+
+	vim.fn.system("tmux select-layout -t 0 '8d8d,210x44,0,0[210x27,0,0,4,210x16,0,28{104x16,0,28,5,105x16,105,28,6}]'")
+	vim.fn.system("tmux select-layout -t 2 '6520,210x44,0,0[210x28,0,0,7,210x15,0,29{104x15,0,29,8,105x15,105,29,9}]'")
+	vim.fn.system(
+		"tmux select-layout -t 3 '2ecf,210x44,0,0[210x32,0,0,10,210x11,0,33{107x11,0,33,11,102x11,108,33,12}]'"
+	)
 end
 
 -- Map the function to `<space>ad` in normal mode
