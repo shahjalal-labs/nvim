@@ -150,38 +150,6 @@ vim.keymap.set("i", "<M-,>", "<C-o>Iexport <Esc>", {
 	silent = true,
 })
 
-local function run_clipboard_command()
-	-- Get clipboard content
-	local command = vim.fn.getreg("+"):gsub("\n", "") -- Remove newlines
-
-	if command == "" then
-		vim.notify("Clipboard is empty!", vim.log.levels.WARN)
-		return
-	end
-
-	-- Notify user that command is running
-	vim.notify("Running: " .. command, vim.log.levels.INFO)
-
-	-- Start job to run command and capture output
-	vim.fn.jobstart(command, {
-		stdout_buffered = true,
-		stderr_buffered = true,
-		on_stdout = function(_, data)
-			if data then
-				vim.notify(table.concat(data, "\n"), vim.log.levels.INFO)
-			end
-		end,
-		on_stderr = function(_, data)
-			if data then
-				vim.notify(table.concat(data, "\n"), vim.log.levels.ERROR)
-			end
-		end,
-	})
-end
-
--- Use `vim.keymap.set` which works better with Lua functions
-vim.keymap.set("n", "<leader>rr", run_clipboard_command, { noremap = true, silent = true })
-
 -- new verSion
 -- Define a function to run a shell command
 function RunCommand()
@@ -262,3 +230,26 @@ vim.api.nvim_set_keymap("n", "t", "@r", { noremap = true, silent = false })
 
 -- command from zsh history
 -- ~/.config/nvim/lua/custom/zsh_history.lua
+-- Function: Open Zsh command history with fzf-lua and run selected command
+local function OpenZshHistoryPicker()
+	local history_file = vim.fn.expand("~/.zsh_history")
+	local history = vim.fn.readfile(history_file)
+
+	if #history == 0 then
+		print("No command history found.")
+		return
+	end
+
+	require("fzf-lua").fzf_exec(history, {
+		prompt = "Select Zsh command: ",
+		actions = {
+			["default"] = function(selected)
+				vim.fn.system(selected[1])
+				print("Running: " .. selected[1])
+			end,
+		},
+	})
+end
+
+-- Keybinding: <leader>ty to trigger Zsh history picker
+vim.keymap.set("n", "<leader>ty", OpenZshHistoryPicker, { desc = "FZF Zsh History Runner" })
