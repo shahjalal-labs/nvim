@@ -116,43 +116,43 @@ vim.keymap.set("v", "<leader>cp", visual_cut_and_paste, {
 
 -- Safe edit helper: saves if modified then edits file
 
--- Jump to JSX Parent Usage function
+-- Jump to JSX Parent component
 local function jump_to_jsx_parent()
 	-- Get current filename without extension (component name)
 	local filename = vim.fn.expand("%:t:r")
-	-- Build regex pattern to match <ComponentName followed by space or >
-	local pattern = "<" .. filename .. "[%s>]"
+	-- Build pattern just "<ComponentName" for flexible JSX tag matching
+	local pattern = "<" .. filename
 
-	-- Use Telescope grep_string with regex inside src/ directory
+	-- Use Telescope grep_string with regex inside src/ directory, prefill prompt with pattern
 	require("telescope.builtin").grep_string({
 		search = pattern,
-		prompt_title = "🔍 JSX Usage of <" .. filename .. ">",
+		prompt_title = "🔍 JSX Usage of <" .. filename,
 		use_regex = true,
 		cwd = "src",
+		default_text = pattern, -- Prefill input so you can refine search
 	})
 end
 
--- Map <leader>jp to jump_to_jsx_parent in normal mode
+-- to jump_to_jsx_parent take current from cursor word
 vim.keymap.set("n", "<leader>jh", jump_to_jsx_parent, { desc = "Jump to JSX Parent (Usage Search)" })
 
 local function jump_to_jsx_parent_from_cursor()
-	-- Get current word under cursor
 	local word = vim.fn.expand("<cword>")
 	if word == "" then
 		print("No word under cursor")
 		return
 	end
 
-	-- Build regex to match opening JSX tag
-	local pattern = "<" .. word .. "[%s>]"
+	-- Pattern just "<Child" so it matches opening tag start flexibly
+	local pattern = "<" .. word
 
 	require("telescope.builtin").grep_string({
 		search = pattern,
-		prompt_title = "🔍 JSX Usage of <" .. word .. ">",
+		prompt_title = "🔍 JSX Usage of <" .. word,
 		use_regex = true,
 		cwd = "src",
+		default_text = pattern, -- Pre-fill prompt with <Child so you can refine
 	})
 end
 
--- Map to <leader>jc or something you like
 vim.keymap.set("n", "<leader>jm", jump_to_jsx_parent_from_cursor, { desc = "Jump to JSX Parent from Cursor Word" })
