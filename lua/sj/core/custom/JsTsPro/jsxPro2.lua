@@ -134,3 +134,25 @@ end
 
 -- Map <leader>jp to jump_to_jsx_parent in normal mode
 vim.keymap.set("n", "<leader>jh", jump_to_jsx_parent, { desc = "Jump to JSX Parent (Usage Search)" })
+
+local function jump_to_jsx_parent_from_cursor()
+	-- Get current word under cursor
+	local word = vim.fn.expand("<cword>")
+	if word == "" then
+		print("No word under cursor")
+		return
+	end
+
+	-- Build regex to match opening JSX tag
+	local pattern = "<" .. word .. "[%s>]"
+
+	require("telescope.builtin").grep_string({
+		search = pattern,
+		prompt_title = "🔍 JSX Usage of <" .. word .. ">",
+		use_regex = true,
+		cwd = "src",
+	})
+end
+
+-- Map to <leader>jc or something you like
+vim.keymap.set("n", "<leader>jm", jump_to_jsx_parent_from_cursor, { desc = "Jump to JSX Parent from Cursor Word" })
