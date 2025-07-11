@@ -106,3 +106,31 @@ vim.keymap.set("v", "<leader>cp", visual_cut_and_paste, {
 	noremap = true,
 	silent = true,
 })
+
+-- jump_to_jsx_parent_dynamic.lua
+-- 🔍 Dynamically search JSX/TSX parent component usage (not props/imports)
+-- 🚀 Matches all valid forms like:
+--     <Component />
+--     <Component prop="x" />
+--     <Component></Component>
+
+-- Safe edit helper: saves if modified then edits file
+
+-- Jump to JSX Parent Usage function
+local function jump_to_jsx_parent()
+	-- Get current filename without extension (component name)
+	local filename = vim.fn.expand("%:t:r")
+	-- Build regex pattern to match <ComponentName followed by space or >
+	local pattern = "<" .. filename .. "[%s>]"
+
+	-- Use Telescope grep_string with regex inside src/ directory
+	require("telescope.builtin").grep_string({
+		search = pattern,
+		prompt_title = "🔍 JSX Usage of <" .. filename .. ">",
+		use_regex = true,
+		cwd = "src",
+	})
+end
+
+-- Map <leader>jp to jump_to_jsx_parent in normal mode
+vim.keymap.set("n", "<leader>jh", jump_to_jsx_parent, { desc = "Jump to JSX Parent (Usage Search)" })
