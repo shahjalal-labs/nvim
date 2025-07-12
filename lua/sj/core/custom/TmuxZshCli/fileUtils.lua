@@ -75,7 +75,7 @@ local function generate_structure_md()
 	file:close()
 
 	-- Open the file in a new tab
-	vim.cmd("tabnew " .. output_file)
+	vim.cmd("edit " .. output_file)
 
 	-- Copy to system clipboard
 	vim.fn.setreg("+", md_content)
