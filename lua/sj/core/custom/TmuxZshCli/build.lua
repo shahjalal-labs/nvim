@@ -1,60 +1,22 @@
---[[ local function open_cname_url_dynamic()
-	local cwd = vim.fn.getcwd()
-	local filepath = cwd .. "/public/CNAME"
+-- w: ╭──────────── Block Start ────────────╮
+--t: Function to send build and cp command to tmux pane
+function SendBuildCommandToTmuxPane()
+	vim.ui.input({ prompt = "Enter tmux pane number (default 2): " }, function(input)
+		-- If input is empty or nil, default to "2"
+		local pane = (input == nil or input == "") and "2" or input
 
-	local file = io.open(filepath, "r")
-	if not file then
-		print("❌ CNAME file not found in " .. filepath)
-		return
-	end
+		local cmd = "bun run build && cp dist/index.html dist/200.html && surge ./dist"
+		local tmux_cmd = string.format("tmux send-keys -t %s '%s' Enter", pane, cmd)
 
-	local url = file:read("*l")
-	file:close()
-
-	if not url or url == "" then
-		print("❌ URL not found in CNAME file.")
-		return
-	end
-
-	-- Prepend https:// if not present
-	if not url:match("^https?://") then
-		url = "https://" .. url
-	end
-
-	local open_cmd = string.format("xdg-open '%s'", url)
-
-	-- Prompt for tmux pane number (auto fallback after 1.5s)
-	local user_input = nil
-	local done = false
-
-	vim.defer_fn(function()
-		if not done then
-			local target_pane = user_input or "2"
-			local tmux_cmd = string.format('tmux send-keys -t %s "%s" Enter', target_pane, open_cmd)
-			os.execute(tmux_cmd)
-			print("🌐 Sent to tmux pane " .. target_pane .. ": " .. url)
-		end
-	end, 1500)
-
-	vim.schedule(function()
-		user_input = vim.fn.input("📦 Send xdg-open to tmux pane [default: 2]: ")
-		done = true
-		local target_pane = user_input ~= "" and user_input or "2"
-		local tmux_cmd = string.format('tmux send-keys -t %s "%s" Enter', target_pane, open_cmd)
-		os.execute(tmux_cmd)
-		print("🌐 Sent to tmux pane " .. target_pane .. ": " .. url)
+		vim.fn.system(tmux_cmd)
+		print("Command sent to tmux pane " .. pane)
 	end)
 end
 
-vim.keymap.set("n", "<leader>bb", open_cname_url_dynamic, {
-	noremap = true,
-	silent = true,
-	desc = "Open CNAME URL in browser (via tmux)",
-}) ]]
+vim.api.nvim_set_keymap("n", "<leader>bb", ":lua SendBuildCommandToTmuxPane()<CR>", { noremap = true, silent = true })
 
-----
----
----
+-- w: ╰───────────── Block End ─────────────╯
+
 --p: ╭──────────── Block Start ────────────╮
 --w: open url in browser from CNAME
 local function open_cname_url_direct()
