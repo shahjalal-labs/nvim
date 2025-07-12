@@ -133,7 +133,7 @@ local function jump_to_jsx_parent()
 	})
 end
 
--- to jump_to_jsx_parent take current from cursor word
+-- to jump_to_jsx_parent take current from cursor existing word
 vim.keymap.set("n", "<leader>jh", jump_to_jsx_parent, { desc = "Jump to JSX Parent (Usage Search)" })
 
 local function jump_to_jsx_parent_from_cursor()
