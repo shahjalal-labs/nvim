@@ -42,6 +42,22 @@ vim.keymap.set("n", "<leader>gm", ":!gh repo view --web<CR>", { noremap = true, 
 --p: ╰───────────── Block End ─────────────╯
 --
 --p: ╭──────────── Block Start ────────────╮
+local function show_github_contrib_today()
+	local date = os.date("%Y-%m-%d")
+	local cmd = table.concat({
+		"gh api graphql -f query='query { viewer { contributionsCollection { contributionCalendar { weeks { contributionDays { date contributionCount } } } } } }' | jq -r '.data.viewer.contributionsCollection.contributionCalendar.weeks[] | .contributionDays[] | select(.date == \""
+			.. date
+			.. '") | "📆 \\(.date): 🔥 \\(.contributionCount) contributions"\'',
+	}, " ")
+
+	vim.cmd("vsplit | terminal " .. cmd)
+end
+
+vim.keymap.set("n", "<leader>gg", show_github_contrib_today, {
+	noremap = true,
+	silent = true,
+	desc = "📈 Show today's GitHub contributions",
+})
 
 --p: ╰───────────── Block End ─────────────╯
 --p: ╭──────────── Block Start ────────────╮
