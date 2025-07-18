@@ -113,3 +113,15 @@ vim.keymap.set("n", "<leader>bo", BuildCopyOpenInTmux, {
 	desc = "Build + copy + open in tmux pane",
 })
 --p: ╰───────────── Block End ─────────────╯
+--
+--
+--
+--p: ╭──────────── Block Start ────────────╮
+vim.keymap.set("n", "<leader>bj", function()
+	local cwd = vim.fn.getcwd()
+	local cmd = string.format("cd %s && npx vite --open", cwd)
+	local tmux_cmd = string.format([[tmux send-keys -t 2 "%s" C-m]], cmd)
+	os.execute(tmux_cmd)
+end, { desc = "Start Vite in tmux pane 2 with browser", silent = true })
+--p: ╰───────────── Block End ─────────────╯
+--

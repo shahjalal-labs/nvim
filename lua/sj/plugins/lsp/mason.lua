@@ -87,7 +87,8 @@ return {
 					"lua_ls",
 					"emmet_ls",
 					-- "prismals",
-					-- "pyright",
+					"pyright",
+					"pylint", -- python linter
 				},
 			})
 		end,
