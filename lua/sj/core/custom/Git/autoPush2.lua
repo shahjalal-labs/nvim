@@ -191,7 +191,7 @@ vim.api.nvim_create_user_command("GitSmartPush", function()
 	intelligentGitPushOneLocAvailable(git_root)
 end, {})
 
-vim.keymap.set("n", "<leader>gb", function()
+vim.keymap.set("n", "<leader>gh", function()
 	local git_root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
 	intelligentGitPushOneLocAvailable(git_root)
 end, { desc = "1 LOC allowed Manual intelligent Git push" })
