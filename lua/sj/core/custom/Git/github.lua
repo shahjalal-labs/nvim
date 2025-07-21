@@ -21,10 +21,11 @@ local function createGitRepoAndPushToGithub()
 	local repo_name = vim.fn.fnamemodify(cwd, ":t")
 	local live_site = "http://shahjalal-mern.surge.sh"
 	local portfolio_github = "https://github.com/shahjalal-labs/shahjalal-portfolio-v2"
-	local portfolio_live = "http://shahjalal-mern.surge.sh"
-	local linkedin = "https://www.linkedin.com/in/shahjalal-mern/"
-	local facebook = "https://www.facebook.com/profile.php?id=61556383702555"
-	local youtube = "https://www.youtube.com/@muhommodshahjalal9811"
+	local portfolio_live = "http://shahjalal-labs.surge.sh"
+	local linkedin = "https://www.linkedin.com/in/shahjalal-labs/"
+
+	local facebook = "https://www.facebook.com/shahjalal.labs"
+	local twitter = "https://x.com/shahjalal_labs"
 
 	-- Prompt for repository name (non-blocking) with default
 	vim.ui.input({ prompt = "Enter the repository name: ", default = repo_name }, function(input)

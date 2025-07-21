@@ -79,7 +79,8 @@ local function BuildCopyOpenInTmux()
 		url = "https://" .. url
 	end
 
-	local build_cmd = string.format("bun run build && cp dist/index.html dist/200.html && xdg-open '%s'", url)
+	local build_cmd =
+		string.format("bun run build && cp dist/index.html dist/200.html &&  surge ./dist  && xdg-open '%s'", url)
 	local user_input = nil
 	local done = false
 
