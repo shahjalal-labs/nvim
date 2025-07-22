@@ -11,25 +11,38 @@
 │       │   │   ├── checking2.lua
 │       │   │   ├── checking-feature.lua
 │       │   │   ├── Git
+│       │   │   │   ├── autoPush2.lua
 │       │   │   │   ├── autoPush.lua
+│       │   │   │   ├── clone.lua
+│       │   │   │   ├── github2.lua
+│       │   │   │   ├── githubDescription.lua
 │       │   │   │   ├── github.lua
+│       │   │   │   ├── githubRepoGenerateAndPush.lua
 │       │   │   │   ├── init.lua
+│       │   │   │   ├── readmeGen2.lua
+│       │   │   │   ├── readmeGenerate.lua
 │       │   │   │   └── smartCopyPaste.lua
 │       │   │   ├── html.lua
 │       │   │   ├── init.lua
 │       │   │   ├── insertMode.lua
 │       │   │   ├── JsTsPro
 │       │   │   │   ├── init.lua
+│       │   │   │   ├── jsTs2.lua
 │       │   │   │   ├── jsTs.lua
-│       │   │   │   └── jsxPro.lua
+│       │   │   │   ├── jsxPro2.lua
+│       │   │   │   ├── jsxPro.lua
+│       │   │   │   └── reBuildModule.lua
 │       │   │   ├── normalModeInInrsert.lua
 │       │   │   ├── others.lua
-│       │   │   ├── tmuxZsh2.lua
-│       │   │   ├── TmuxZshCli
-│       │   │   │   ├── init.lua
-│       │   │   │   ├── nvimTerminal.lua
-│       │   │   │   └── tmuxCommandSender.lua
-│       │   │   └── tmuxZsh.lua
+│       │   │   └── TmuxZshCli
+│       │   │       ├── build.lua
+│       │   │       ├── fileUtils.lua
+│       │   │       ├── init.lua
+│       │   │       ├── nvimTerminal.lua
+│       │   │       ├── tmuxCommandSender.lua
+│       │   │       ├── tmuxPaneContent.lua
+│       │   │       ├── tmuxZsh2.lua
+│       │   │       └── tmuxZsh.lua
 │       │   ├── init.lua
 │       │   ├── keymaps.lua
 │       │   ├── options.lua
@@ -45,6 +58,7 @@
 │           ├── chatgpt.lua
 │           ├── colorscheme.lua
 │           ├── comment.lua
+│           ├── copilotChat.lua
 │           ├── cursor-line.lua
 │           ├── dressing.lua
 │           ├── emoji.lua
@@ -91,9 +105,10 @@
 │           ├── which-key.lua
 │           ├── yanky.lua
 │           └── yazi.lua
+├── readmeGenerateFull.md
 ├── README.md
 └── structure.md
 
-10 directories, 82 files
+10 directories, 97 files
 
 ```
