@@ -8,9 +8,6 @@ local function createGitRepoAndPushToGithub()
 	-- Get the current working directory
 	local cwd = vim.fn.getcwd()
 
-	-- Get the system username
-	local username = vim.fn.system("whoami"):gsub("%s+", "")
-
 	-- Get the current date and time
 	local date_time = os.date("%d/%m/%Y %I:%M %p %a GMT+6")
 
@@ -50,12 +47,11 @@ local function createGitRepoAndPushToGithub()
 | 💻 **Portfolio GitHub** | [%s](%s)                                                                  |
 | 🌐 **Portfolio Live**   | [%s](%s)                                                                  |
 | 📁 **Directory**        | `%s`                                                                      |
-| 👤 **Username**         | `%s`                                                                      |
 | 📅 **Created On**       | `%s`                                                                      |
 | 📍 **Location**         | %s                                                                        |
 | 💼 **LinkedIn**         | [%s](%s)                                                                  |
 | 📘 **Facebook**         | [%s](%s)                                                                  |
-| ▶️ **YouTube**          | [%s](%s)                                                                  |
+| ▶️ **Twitter**          | [%s](%s)                                                                  |
 
 ---
 ### `Developer info:`
@@ -74,15 +70,14 @@ local function createGitRepoAndPushToGithub()
 			portfolio_live,
 			portfolio_live,
 			cwd,
-			username,
 			date_time,
 			location,
 			linkedin,
 			linkedin,
 			facebook,
 			facebook,
-			youtube,
-			youtube
+			twitter,
+			twitter
 		)
 		-- Check if README.md exists and append content at the top
 		local readme_file_path = "README.md"
