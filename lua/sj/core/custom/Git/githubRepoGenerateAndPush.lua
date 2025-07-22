@@ -236,104 +236,35 @@
 -- end
 --
 -- vim.keymap.set("n", "<leader>gk", createGitRepoAndPushToGithub, { noremap = true, silent = true })
---w: updated
---p: ╭──────────── Block Start ────────────╮
--- githubRepoGenerateAndPush.lua
-
-local M = {}
-
--- 🔁 Util functions
-local function slugify(str)
-	return str:lower():gsub("[^%w]", "")
-end
-
-local function strip_marker(name)
-	local lower = name:lower()
-	for _, marker in ipairs({ "client", "server" }) do
-		if lower:sub(-#marker) == marker then
-			local sep_pos = #name - #marker
-			if name:sub(sep_pos, sep_pos) == "-" or name:sub(sep_pos, sep_pos) == "_" then
-				return name:sub(1, sep_pos - 1)
-			else
-				return name:sub(1, #name - #marker)
-			end
-		end
-		if lower:sub(1, #marker) == marker then
-			local sep_pos = #marker + 1
-			if name:sub(sep_pos, sep_pos) == "-" or name:sub(sep_pos, sep_pos) == "_" then
-				return name:sub(sep_pos + 1)
-			else
-				return name:sub(#marker + 1)
-			end
-		end
-	end
-	return name
-end
-
-local function is_react_project()
-	local package_json = vim.fn.getcwd() .. "/package.json"
-	if vim.fn.filereadable(package_json) == 1 then
-		local content = table.concat(vim.fn.readfile(package_json), "\n")
-		return content:match('"react"%s*:') ~= nil
-	end
-	return false
-end
-
-local function update_index_html_title(slug)
-	local path = vim.fn.getcwd() .. "/index.html"
-	if vim.fn.filereadable(path) == 1 then
-		local content = vim.fn.readfile(path)
-		for i, line in ipairs(content) do
-			if line:match("<title>") then
-				content[i] = "    <title>" .. slug .. "</title>"
-				break
-			end
-		end
-		vim.fn.writefile(content, path)
-	end
-end
-
-local function tmux_pane_exists(pane_num)
-	local panes = vim.fn.systemlist("tmux list-panes -F '#P'")
-	for _, pane in ipairs(panes) do
-		if tonumber(pane) == pane_num then
-			return true
-		end
-	end
-	return false
-end
-
-local function send_to_tmux(pane, cmd)
-	local full = string.format("tmux send-keys -t %d '%s' Enter", pane, cmd)
-	os.execute(full)
-end
-
-local function restore_tmux_layouts()
-	os.execute("tmux select-layout tiled")
-	os.execute("tmux select-pane -t 0")
-end
-
-function M.createGitRepoAndPushToGithub()
+--
+--
+local function createGitRepoAndPushToGithub()
 	local cwd = vim.fn.getcwd()
-	local folder = vim.fn.fnamemodify(cwd, ":t")
-	local base = strip_marker(folder)
-	local slug = slugify(base)
-	local date = os.date("%d/%m/%Y %I:%M %p %a GMT+6")
+	local folder_name = vim.fn.fnamemodify(cwd, ":t")
+	local base_name = strip_marker(folder_name)
+	local project_slug = slugify(base_name)
+	local live_site = "https://" .. project_slug .. ".surge.sh"
+	local date_time = os.date("%d/%m/%Y %I:%M %p %a GMT+6")
 	local location = "Sharifpur, Gazipur, Dhaka"
-	local site = "https://" .. slug .. ".surge.sh"
-	local git_url = "https://github.com/shahjalal-labs/" .. base
+	local portfolio_github = "https://github.com/shahjalal-labs/shahjalal-portfolio-v2"
+	local portfolio_live = "http://shahjalal-labs.surge.sh"
+	local linkedin = "https://www.linkedin.com/in/shahjalal-labs/"
+	local facebook = "https://www.facebook.com/shahjalal.labs"
+	local twitter = "https://x.com/shahjalal_labs"
 
-	local readme = cwd .. "/README.md"
-	local cname = cwd .. "/public/CNAME"
-	local dev_md = cwd .. "/developer.md"
+	local readme_path = cwd .. "/README.md"
+	local cname_path = cwd .. "/public/CNAME"
+	local developer_md_path = cwd .. "/developer.md"
 
-	vim.ui.input({ prompt = "Enter repository name: ", default = base }, function(repo)
-		local repo_name = repo or base
-		local final_url = "https://github.com/shahjalal-labs/" .. repo_name
+	vim.ui.input({ prompt = "Enter the repository name: ", default = base_name }, function(input)
+		local repo_name = input or base_name
+		local github_url = "https://github.com/shahjalal-labs/" .. repo_name
 
-		local md = string.format(
-			[[
-# 🌟 %s
+		vim.cmd("redrawstatus")
+		vim.cmd("echo 'Initializing repository...'")
+
+		local readme_content = string.format(
+			[[# 🌟 %s
 
 ## 📂 Project Information
 
@@ -341,64 +272,96 @@ function M.createGitRepoAndPushToGithub()
 |------------------------|---------------------------------------------------------------------------|
 | 🔗 **GitHub URL**       | [%s](%s)                                                                  |
 | 🌐 **Live Site**        | [%s](%s)                                                                  |
-| 💻 **Portfolio GitHub** | [Portfolio](https://github.com/shahjalal-labs/shahjalal-portfolio-v2)     |
-| 🌐 **Portfolio Live**   | [Portfolio Live](http://shahjalal-labs.surge.sh)                          |
+| 💻 **Portfolio GitHub** | [%s](%s)                                                                  |
+| 🌐 **Portfolio Live**   | [%s](%s)                                                                  |
 | 📁 **Directory**        | `%s`                                                                      |
 | 📅 **Created On**       | `%s`                                                                      |
 | 📍 **Location**         | %s                                                                        |
-| 💼 **LinkedIn**         | [LinkedIn](https://www.linkedin.com/in/shahjalal-labs/)                   |
-| 📘 **Facebook**         | [Facebook](https://www.facebook.com/shahjalal.labs)                       |
-| ▶️ **Twitter**          | [Twitter](https://x.com/shahjalal_labs)                                   |
+| 💼 **LinkedIn**         | [%s](%s)                                                                  |
+| 📘 **Facebook**         | [%s](%s)                                                                  |
+| ▶️ **Twitter**          | [%s](%s)                                                                  |
 
 ---
 ### `Developer info:`
-![Developer Info](https://i.ibb.co/kVR4YmrX/developer-Info-Github-Banner.png)
+![Developer Info:](https://i.ibb.co/kVR4YmrX/developer-Info-Github-Banner.png)
+
+> 🚀
+> 🧠
 ]],
 			repo_name,
-			final_url,
-			final_url,
-			site,
-			site,
+			github_url,
+			github_url,
+			live_site,
+			live_site,
+			portfolio_github,
+			portfolio_github,
+			portfolio_live,
+			portfolio_live,
 			cwd,
-			date,
-			location
+			date_time,
+			location,
+			linkedin,
+			linkedin,
+			facebook,
+			facebook,
+			twitter,
+			twitter
 		)
 
-		vim.fn.writefile({ md }, readme)
-		os.execute("mkdir -p " .. cwd .. "/public")
-		vim.fn.writefile({ slug .. ".surge.sh" }, cname)
-		vim.fn.writefile({ "-- Developer notes" }, dev_md)
+		local readme_existing = ""
+		if vim.fn.filereadable(readme_path) == 1 then
+			readme_existing = table.concat(vim.fn.readfile(readme_path), "\n")
+		end
+		local final_readme = readme_content .. "\n" .. readme_existing
 
-		local function run(cmd)
-			local out = vim.fn.system(cmd)
+		local readme_file = io.open(readme_path, "w")
+		readme_file:write(final_readme)
+		readme_file:close()
+
+		os.execute("mkdir -p " .. cwd .. "/public")
+		local cname_file = io.open(cname_path, "w")
+		cname_file:write(project_slug .. ".surge.sh\n")
+		cname_file:close()
+
+		local developer_md_file = io.open(developer_md_path, "w")
+		developer_md_file:write("-- Your developer.md content here --")
+		developer_md_file:close()
+
+		local function run_git(cmd)
+			local output = vim.fn.system(cmd)
 			if vim.v.shell_error ~= 0 then
-				vim.notify("Git error: " .. out, vim.log.levels.ERROR)
+				vim.notify("Git error: " .. output, vim.log.levels.ERROR)
 				return false
 			end
 			return true
 		end
 
-		if not run("git init") then
+		if not run_git("git init") then
 			return
 		end
-		if not run("git add .") then
+		if not run_git("git add .") then
 			return
 		end
-		if not run("git commit -m 'Initial commit'") then
+		if not run_git("git commit -m 'Initial commit'") then
 			return
 		end
-		if not run("git branch -M main") then
-			return
-		end
-		if not run(string.format("gh repo create %s --public --source=. --remote=origin --push", repo_name)) then
+		if not run_git("git branch -M main") then
 			return
 		end
 
-		vim.notify("✅ GitHub repository created and pushed!", vim.log.levels.INFO)
-		os.execute("xdg-open " .. final_url)
+		local create_repo_cmd = string.format("gh repo create %s --public --source=. --remote=origin --push", repo_name)
+		if not run_git(create_repo_cmd) then
+			return
+		end
+
+		vim.cmd("redrawstatus")
+		vim.notify("Repository created and pushed successfully!", vim.log.levels.INFO)
+
+		os.execute("xdg-open " .. github_url)
+		vim.cmd("echo 'GitHub repository created and pushed!'")
 
 		if is_react_project() then
-			update_index_html_title(slug)
+			update_index_html_title(project_slug)
 
 			if not tmux_pane_exists(2) then
 				os.execute("tmux split-window -h")
@@ -407,19 +370,15 @@ function M.createGitRepoAndPushToGithub()
 				os.execute("tmux split-window -v")
 			end
 
-			send_to_tmux(
-				2,
-				"bun i && bun run build && cp dist/index.html dist/200.html && surge ./dist && xdg-open " .. site
+			local surge_cmd = string.format(
+				"bun i && bun run build && cp dist/index.html dist/200.html && surge ./dist && xdg-open https://%s.surge.sh",
+				project_slug
 			)
-			send_to_tmux(3, "bunx vite --open")
 
-			restore_tmux_layouts()
-			vim.notify("🚀 React + Surge + Vite setup complete", vim.log.levels.INFO)
+			send_to_tmux(2, surge_cmd)
+			send_to_tmux(3, "npx vite --open")
+			vim.notify("React project setup completed with Surge + Vite", vim.log.levels.INFO)
 		end
 	end)
 end
-
--- Optional keybinding
-vim.keymap.set("n", "<leader>gk", M.createGitRepoAndPushToGithub, { noremap = true, silent = true })
-
-return M
+vim.keymap.set("n", "<leader>gk", createGitRepoAndPushToGithub, { noremap = true, silent = true })
