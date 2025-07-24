@@ -20,7 +20,7 @@ end
 
 function M.scroll_down()
 	if M.active then
-		vim.cmd("normal! 10j")
+		vim.api.nvim_input("10<C-d>")
 	else
 		vim.cmd("normal! w")
 	end
@@ -28,23 +28,19 @@ end
 
 function M.scroll_up()
 	if M.active then
-		vim.cmd("normal! 10k")
+		vim.api.nvim_input("10<C-u>")
 	else
 		vim.cmd("normal! e")
 	end
 end
 
 vim.keymap.set("n", "<leader>s,", M.toggle, { desc = "Toggle Scroll Mode" })
-
 vim.keymap.set("n", "w", function()
 	M.scroll_down()
 end, { desc = "Scroll Down 10 or Move Word", noremap = true })
-
 vim.keymap.set("n", "e", function()
 	M.scroll_up()
 end, { desc = "Scroll Up 10 or Move Word", noremap = true })
-
--- Add <Esc> mapping to exit scroll mode
 vim.keymap.set("n", "<Esc>", function()
 	M.disable()
 end, { desc = "Exit Scroll Mode", noremap = true })

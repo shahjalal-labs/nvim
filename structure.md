@@ -31,7 +31,8 @@
 │       │   │   │   ├── jsTs.lua
 │       │   │   │   ├── jsxPro2.lua
 │       │   │   │   ├── jsxPro.lua
-│       │   │   │   └── reBuildModule.lua
+│       │   │   │   ├── reBuildModule.lua
+│       │   │   │   └── scroll_mode.lua
 │       │   │   ├── normalModeInInrsert.lua
 │       │   │   ├── others.lua
 │       │   │   └── TmuxZshCli
@@ -109,6 +110,6 @@
 ├── README.md
 └── structure.md
 
-10 directories, 97 files
+10 directories, 98 files
 
 ```
