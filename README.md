@@ -62,6 +62,48 @@ The main goals of this configuration are:
 ---
 ```
 
+## Key Highlights
+
+### Core Modules (`lua/sj/core/custom`)
+
+- **Git Automation:**  
+  Scripts for automating Git tasks such as cloning repos, auto-pushing changes, generating GitHub repo descriptions, smart copy-paste, and automated README generation.
+
+- **Custom Modes:**  
+  Advanced custom modes and scroll modes that enhance Neovim’s behavior beyond defaults.
+
+- **JS/TS Pro Setup:**  
+  Dedicated files providing advanced support for JavaScript, TypeScript, and JSX development with custom tooling.
+
+- **Terminal & Shell Integration:**  
+  Modules facilitating smooth workflows with Tmux and Zsh inside Neovim, including command sending and terminal buffer management.
+
+### Plugins (`lua/sj/plugins`)
+
+- Well-curated set of plugins for coding productivity, UI enhancements, Git integration, language servers, syntax highlighting, code completion, and more.
+
+- Examples include: `telescope`, `lualine`, `gitsigns`, `nvim-cmp`, `treesitter`, `noice`, `copilotChat`, `fzf-lua`, and many others.
+
+- Plugin configs are modular, focused on clean setup and performance.
+
+### Configuration Entrypoints
+
+- `init.lua` initializes core settings, loads plugins, and sets up custom keymaps and modes.
+
+- `lazy.lua` handles lazy-loading and management of plugins.
+
+- Core options and mappings are clearly separated for easy adjustments.
+
+---
+
+## How to Use
+
+- Clone the repository into your Neovim config directory (usually `~/.config/nvim`):
+
+  ```bash
+  git clone <this-repo-url> ~/.config/nvim
+  ```
+
 ### `Developer info:`
 
 ![Developer Info:](https://i.ibb.co/kVR4YmrX/developer-Info-Github-Banner.png)
