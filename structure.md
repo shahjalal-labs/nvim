@@ -10,6 +10,9 @@
 │       │   ├── custom
 │       │   │   ├── checking2.lua
 │       │   │   ├── checking-feature.lua
+│       │   │   ├── CustomMode
+│       │   │   │   ├── init.lua
+│       │   │   │   └── ScrollMode.lua
 │       │   │   ├── Git
 │       │   │   │   ├── autoPush2.lua
 │       │   │   │   ├── autoPush.lua
@@ -31,8 +34,7 @@
 │       │   │   │   ├── jsTs.lua
 │       │   │   │   ├── jsxPro2.lua
 │       │   │   │   ├── jsxPro.lua
-│       │   │   │   ├── reBuildModule.lua
-│       │   │   │   └── scroll_mode.lua
+│       │   │   │   └── reBuildModule.lua
 │       │   │   ├── normalModeInInrsert.lua
 │       │   │   ├── others.lua
 │       │   │   └── TmuxZshCli
@@ -110,6 +112,6 @@
 ├── README.md
 └── structure.md
 
-10 directories, 98 files
+11 directories, 99 files
 
 ```

@@ -5,7 +5,7 @@ return {
 		local lualine = require("lualine")
 		local lazy_status = require("lazy.status") -- to configure lazy pending updates count
 		-- local scroll_mode = require("scroll_mode")
-		local scroll_mode = require("sj.core.custom.JsTsPro.scroll_mode")
+		local scroll_mode = require("sj.core.custom.CustomMode.ScrollMode")
 
 		local colors = {
 			blue = "#65D1FF",
