@@ -104,6 +104,79 @@ The main goals of this configuration are:
   git clone <this-repo-url> ~/.config/nvim
   ```
 
+  ## 🚀 Getting Started After Installation
+
+After cloning the config, follow these steps to get the full experience:
+
+- 🧠 **Open Neovim**  
+  Let the plugin manager [`lazy.nvim`](https://github.com/folke/lazy.nvim) automatically install all configured plugins.
+
+- 🛠️ **Explore Keymaps**  
+  Check out custom commands and keybindings inside  
+  `lua/sj/core/keymaps.lua`.
+
+- 🧬 **Use Git Automation Scripts**  
+  Navigate to `lua/sj/core/custom/Git` to leverage automation for:
+  - Cloning & pushing repos
+  - Generating README/descriptions
+  - Smart copy-paste and more
+
+- ⚙️ \*\*
+  - Core settings → `lua/sj/core/options.lua`
+  - Plugins → `lua/sj/plugins/`
+  - Custom logic & modes → `lua/sj/core/custom/`
+
+---
+
+## 🧭 Philosophy
+
+- 🧪 **CLI-first & Automation-minded**  
+  Built to maximize terminal power. Uses Lua + shell integrations for a seamless, productive experience.
+
+- 🧱 **Modularity & Clarity**  
+  Every feature is split into logical modules. Easy to navigate, extend, or disable.
+
+- 💻 **Modern JS/TS Focus**  
+  Includes advanced tooling for JavaScript, TypeScript, React/JSX. Perfect for web developers.
+
+- 🔄 **Up-to-date & Community-powered**  
+  Uses actively maintained plugins, best practices, and the latest Neovim APIs.
+
+---
+
+## 🔮 Future Plans
+
+- 🚀 Expand Git automation modules even further.
+- 🌐 Add support for more languages & frameworks.
+- 🔧 Improve Tmux/Zsh integration and terminal workflows.
+- 🎛️ Develop additional **custom modes**, interactive UIs, and dynamic behavior extensions.
+
+---
+
+## 🤝 Contributing
+
+Contributions and suggestions are **very welcome**!
+
+Feel free to:
+
+- 📂 Fork the repo
+- 🛠️ Create new features or improvements
+- 🔁 Submit pull requests
+- 🐞 Report bugs or open issues
+
+---
+
+## 📄 License
+
+This repository is **open-source**. Use it, learn from it, and customize it for your own workflow. No restrictions!
+
+---
+
+## 📬 Want Help?
+
+If you'd like a **developer onboarding guide**, **feature walkthrough**, or a **short summary**,  
+**just ask** — happy to generate it for you!
+
 ### `Developer info:`
 
 ![Developer Info:](https://i.ibb.co/kVR4YmrX/developer-Info-Github-Banner.png)
