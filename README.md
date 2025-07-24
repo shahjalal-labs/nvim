@@ -60,9 +60,8 @@ The main goals of this configuration are:
 └── structure.md                # Documentation of the repo/project structure
 
 ---
+```
 
 ### `Developer info:`
 
 ![Developer Info:](https://i.ibb.co/kVR4YmrX/developer-Info-Github-Banner.png)
-
-```
