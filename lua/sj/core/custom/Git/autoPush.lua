@@ -231,7 +231,7 @@ local function generate_git_summary(git_root)
 		table.insert(parts, "feat: Added " .. table.concat(added, ", "))
 	end
 	if #modified > 0 then
-		table.insert(parts, "improve: Updated " .. table.concat(modified, ", "))
+		table.insert(parts, "refactor: Updated " .. table.concat(modified, ", "))
 	end
 	if #deleted > 0 then
 		table.insert(parts, "chore: Removed " .. table.concat(deleted, ", "))

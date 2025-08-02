@@ -5,16 +5,16 @@
 | 📝 **Detail**           | 📌 **Value**                                                                                                         |
 | ----------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | 🔗 **GitHub URL**       | [https://github.com/shahjalal-labs/nvim](https://github.com/shahjalal-labs/nvim)                                     |
-| 🌐 **Live Site**        | [http://shahjalal-mern.surge.sh](http://shahjalal-mern.surge.sh)                                                     |
+| 🌐 **Live Site**        | [http://shahjalal-labs.surge.sh](http://shahjalal-labs.surge.sh)                                                     |
 | 💻 **Portfolio GitHub** | [https://github.com/shahjalal-labs/shahjalal-portfolio-v2](https://github.com/shahjalal-labs/shahjalal-portfolio-v2) |
-| 🌐 **Portfolio Live**   | [http://shahjalal-mern.surge.sh](http://shahjalal-mern.surge.sh)                                                     |
+| 🌐 **Portfolio Live**   | [http://shahjalal-labs.surge.sh](http://shahjalal-labs.surge.sh)                                                     |
 | 📁 **Directory**        | `/home/sj/.config/nvim`                                                                                              |
 | 👤 **Username**         | `sj`                                                                                                                 |
-| 📅 **Created On**       | `04/07/2025 09:28 অপরাহ্ণ শুক্র GMT+6`                                                                               |
+| 📅 **Created On**       | `04/07/2025 09:28 AM Fri GMT+6`                                                                                      |
 | 📍 **Location**         | Sharifpur, Gazipur, Dhaka                                                                                            |
-| 💼 **LinkedIn**         | [https://www.linkedin.com/in/shahjalal-mern/](https://www.linkedin.com/in/shahjalal-mern/)                           |
-| 📘 **Facebook**         | [https://www.facebook.com/profile.php?id=61556383702555](https://www.facebook.com/profile.php?id=61556383702555)     |
-| ▶️ **YouTube**          | [https://www.youtube.com/@muhommodshahjalal9811](https://www.youtube.com/@muhommodshahjalal9811)                     |
+| 💼 **LinkedIn**         | [https://www.linkedin.com/in/shahjalal-labs/](https://www.linkedin.com/in/shahjalal-labs/)                           |
+| 📘 **Facebook**         | [https://www.facebook.com/shahjalal.labs](https://www.facebook.com/shahjalal.labs)                                   |
+| ▶️ **Twitter**          | [https://www.x.com/@shahjalal_labs](https://www.x.com/@shahjalal_labs)                                               |
 
 ---
 
