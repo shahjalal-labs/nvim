@@ -160,4 +160,80 @@ vim.api.nvim_set_keymap("v", "<leader>sg", ":<C-u>lua search_google_selection()<
 
 -- ╭──────────── Block Start ────────────╮
 
+vim.api.nvim_set_keymap("n", "<leader>pj", [[:lua CreateJobDescriptionFile()<CR>]], { noremap = true, silent = true })
+
+function CreateJobDescriptionFile()
+	local base_dir = "/run/media/sj/developer/web/L1B11/career/JobDocuments/jobDescription"
+	vim.fn.mkdir(base_dir, "p")
+
+	local function get_next_filename()
+		local i = 1
+		while true do
+			local file = string.format("%s/jd%d.md", base_dir, i)
+			local f = io.open(file, "r")
+			if not f then
+				return file
+			else
+				f:close()
+				i = i + 1
+			end
+		end
+	end
+
+	local new_file = get_next_filename()
+
+	-- Sample content for job description markdown
+	local content = [[
+🏭 ExampleCorp — Software Engineer  
+📍 Company Location: Singapore  
+🌍 Applicant Location: Remote  
+🕒 Date: ]] .. os.date("%d-%m-%y") .. [[
+
+---
+
+### 📋 Job Description  
+We're hiring a *Software Engineer*
+
+### 💼 Type  
+Contract / Part-Time / Full-Time  
+
+### 🛠️ Tech Stack  
+- Frontend: ReactJS, Material UI  
+- Backend: Node.js, REST APIs  
+- Database: PostgreSQL  
+
+### 💰 Compensation  
+- ₹30,000–40,000 INR/month  
+- ≈ 42,900–57,200 BDT/month (converted)  
+
+### 🎯 Requirements  
+- **Required**: ReactJS, Node.js, REST APIs  
+- **Optional**: Material UI, PostgreSQL  
+
+### 🧾 How to Apply  
+Send your resume and email via direct message (DM)
+
+---
+
+]]
+
+	-- Write content to file
+	local f = io.open(new_file, "w")
+	f:write(content)
+	f:close()
+
+	-- Copy content to clipboard
+	-- Try both wl-copy and xclip support
+	if vim.fn.executable("wl-copy") == 1 then
+		vim.fn.system("wl-copy", content)
+	elseif vim.fn.executable("xclip") == 1 then
+		vim.fn.system("xclip -selection clipboard", content)
+	else
+		print("Clipboard utility not found (install wl-clipboard or xclip)")
+	end
+
+	-- Open in current tab
+	vim.cmd("edit " .. new_file)
+end
 -- ╰───────────── Block End ─────────────╯
+--
