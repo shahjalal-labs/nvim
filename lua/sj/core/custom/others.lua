@@ -160,5 +160,78 @@ vim.api.nvim_set_keymap("v", "<leader>sg", ":<C-u>lua search_google_selection()<
 
 -- ╭──────────── Block Start ────────────╮
 
+vim.keymap.set("n", "<leader>pj", function()
+	local jobdir = "/run/media/sj/developer/web/L1B11/career/JobDocuments/jobDescription/"
+	local base = jobdir .. "jd"
+	local ext = ".md"
+
+	-- Step 1: Read clipboard
+	local clipboard = vim.fn.system("wl-paste")
+	clipboard = clipboard:gsub("\r", "") -- clean carriage return
+
+	-- Step 2: Find next available filename
+	local filename = base .. ext
+	local i = 1
+	while vim.fn.filereadable(filename) == 1 do
+		filename = base .. i .. ext
+		i = i + 1
+	end
+
+	-- Step 3: Prompt template
+	local prompt = [[
+### 📋 INSTRUCTIONS:
+You are a job formatter. Convert the following **raw job description** into a structured and detailed markdown format like the sample below.
+
+#### 🔧 Your Task:
+1. Extract key information: company name, title, location, timezone, type, stack (required & optional), how to apply.
+2. Convert currencies to BDT and show original.
+3. Convert timezones to GMT+6 (Dhaka), retain original too.
+4. Generate output using this exact markdown structure:
+
+```markdown
+### 1. `🏢 Company Name — Job Title`
+
+<pre><code>
+📅 Applied On: (Not yet applied)
+💰 Stipend/Salary : ORIGINAL ≈ BDT / Monthly
+⏰ Hours: Dhaka Time (GMT+6) → Original Timezone
+🧰 Stack: Required stacks
+📆 Interview Date: (Not yet scheduled)
+🌐 Location: Full Location + timezone
+🧭 Platform: Application Source (e.g., Discord/Email)
+⏳ Status: 🟡 Pending
+</code></pre>
+
+🔗 [Company Website]() `url` <br />
+🔗 [Job Link]() `link`
+
+<details>
+<summary>📓 Notes</summary>
+
+- Mention any assumptions or missing info.
+- Application method (DM, Email, Google Form, etc).
+</details>
+
+  ]] .. clipboard .. "\n```"
+
+	-- Step 4: Write to file
+	local f = io.open(filename, "w")
+	if f then
+		f:write(prompt)
+		f:close()
+	else
+		vim.notify("❌ Failed to write job file", vim.log.levels.ERROR)
+		return
+	end
+
+	-- Step 5: Open in current tab
+	vim.cmd("edit " .. filename)
+
+	-- Step 6: Copy prompt to clipboard
+	vim.fn.system("wl-copy", prompt)
+
+	vim.notify("✅ JD prompt created: " .. vim.fn.fnamemodify(filename, ":t"))
+end, { desc = "Create job prompt from clipboard (JD)" })
+
 -- ╰───────────── Block End ─────────────╯
 --
