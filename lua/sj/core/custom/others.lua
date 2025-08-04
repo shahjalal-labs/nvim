@@ -160,80 +160,48 @@ vim.api.nvim_set_keymap("v", "<leader>sg", ":<C-u>lua search_google_selection()<
 
 -- ╭──────────── Block Start ────────────╮
 
-vim.api.nvim_set_keymap("n", "<leader>pj", [[:lua CreateJobDescriptionFile()<CR>]], { noremap = true, silent = true })
+function create_jd_from_clipboard()
+	local base_path = "/run/media/sj/developer/web/L1B11/career/JobDocuments"
+	local handle = io.popen("ls -1 " .. base_path .. "/jd*.md 2>/dev/null")
+	local files = handle:read("*a")
+	handle:close()
 
-function CreateJobDescriptionFile()
-	local base_dir = "/run/media/sj/developer/web/L1B11/career/JobDocuments/jobDescription"
-	vim.fn.mkdir(base_dir, "p")
-
-	local function get_next_filename()
-		local i = 1
-		while true do
-			local file = string.format("%s/jd%d.md", base_dir, i)
-			local f = io.open(file, "r")
-			if not f then
-				return file
-			else
-				f:close()
-				i = i + 1
-			end
+	local max_n = 0
+	for filename in string.gmatch(files, "jd(%d+)%.md") do
+		local num = tonumber(filename)
+		if num and num > max_n then
+			max_n = num
 		end
 	end
 
-	local new_file = get_next_filename()
+	local next_n = max_n + 1
+	local new_file = base_path .. "/jd" .. next_n .. ".md"
 
-	-- Sample content for job description markdown
-	local content = [[
-🏭 ExampleCorp — Software Engineer  
-📍 Company Location: Singapore  
-🌍 Applicant Location: Remote  
-🕒 Date: ]] .. os.date("%d-%m-%y") .. [[
+	-- get clipboard content (assumes wl-clipboard is installed)
+	local handle_clip = io.popen("wl-paste")
+	local content = handle_clip:read("*a")
+	handle_clip:close()
 
----
+	-- write to file
+	local file = io.open(new_file, "w")
+	if file then
+		file:write(content)
+		file:close()
 
-### 📋 Job Description  
-We're hiring a *Software Engineer*
+		-- copy content back to clipboard for reuse
+		local tmp = os.tmpname()
+		local f = io.open(tmp, "w")
+		f:write(content)
+		f:close()
+		os.execute("wl-copy < " .. tmp)
+		os.remove(tmp)
 
-### 💼 Type  
-Contract / Part-Time / Full-Time  
-
-### 🛠️ Tech Stack  
-- Frontend: ReactJS, Material UI  
-- Backend: Node.js, REST APIs  
-- Database: PostgreSQL  
-
-### 💰 Compensation  
-- ₹30,000–40,000 INR/month  
-- ≈ 42,900–57,200 BDT/month (converted)  
-
-### 🎯 Requirements  
-- **Required**: ReactJS, Node.js, REST APIs  
-- **Optional**: Material UI, PostgreSQL  
-
-### 🧾 How to Apply  
-Send your resume and email via direct message (DM)
-
----
-
-]]
-
-	-- Write content to file
-	local f = io.open(new_file, "w")
-	f:write(content)
-	f:close()
-
-	-- Copy content to clipboard
-	-- Try both wl-copy and xclip support
-	if vim.fn.executable("wl-copy") == 1 then
-		vim.fn.system("wl-copy", content)
-	elseif vim.fn.executable("xclip") == 1 then
-		vim.fn.system("xclip -selection clipboard", content)
+		print("📄 Created JD: jd" .. next_n .. ".md and content re-copied to clipboard")
 	else
-		print("Clipboard utility not found (install wl-clipboard or xclip)")
+		print("❌ Failed to create JD file.")
 	end
-
-	-- Open in current tab
-	vim.cmd("edit " .. new_file)
 end
+
+vim.api.nvim_set_keymap("n", "<leader>pj", ":lua create_jd_from_clipboard()<CR>", { noremap = true, silent = true })
 -- ╰───────────── Block End ─────────────╯
 --
